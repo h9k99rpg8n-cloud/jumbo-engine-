@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export class EmptyGridScene {
-  constructor({ gridSize = 100, gridDivisions = 100 } = {}) {
+  constructor({ gridSize = 200, gridDivisions = 200 } = {}) {
     this.gridSize = gridSize;
     this.gridDivisions = gridDivisions;
     this.scene = null;
@@ -21,7 +21,7 @@ export class EmptyGridScene {
       0x172033,
     );
 
-    grid.name = 'Rejilla 100 x 100';
+    grid.name = 'Rejilla 200 x 200';
     grid.position.set(0, 0, 0);
     this.scene.add(grid);
 
