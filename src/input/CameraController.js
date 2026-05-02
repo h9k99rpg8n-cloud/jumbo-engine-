@@ -13,6 +13,8 @@ export class CameraController {
     this.domElement = domElement;
     this.target = target || new THREE.Vector3(0, 0, 0);
 
+    this.bloqueado = false;
+
     this.minDistance = minDistance;
     this.maxDistance = maxDistance;
 
@@ -57,7 +59,18 @@ export class CameraController {
     this.actualizar(true);
   }
 
+  setBloqueado(bloqueado) {
+    this.bloqueado = bloqueado;
+    if (bloqueado) {
+      this.activePointers.clear();
+      this.lastPinchDistance = null;
+      this.lastPinchCenter = null;
+    }
+  }
+
   onPointerDown(event) {
+    if (this.bloqueado) return;
+
     event.preventDefault();
     this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     this.domElement.setPointerCapture?.(event.pointerId);
@@ -75,6 +88,7 @@ export class CameraController {
   }
 
   onPointerMove(event) {
+    if (this.bloqueado) return;
     if (!this.activePointers.has(event.pointerId)) return;
 
     event.preventDefault();
@@ -103,6 +117,8 @@ export class CameraController {
   }
 
   onPointerUp(event) {
+    if (this.bloqueado) return;
+
     this.activePointers.delete(event.pointerId);
     this.lastPinchDistance = null;
     this.lastPinchCenter = null;
@@ -115,6 +131,8 @@ export class CameraController {
   }
 
   onWheel(event) {
+    if (this.bloqueado) return;
+
     event.preventDefault();
     this.zoom(event.deltaY * this.wheelZoomSpeed);
   }
