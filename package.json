@@ -1,0 +1,26 @@
+{
+  "name": "jumbo-engine",
+  "version": "0.1.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "eas:ios": "eas build --platform ios --profile production",
+    "eas:preview": "eas build --platform ios --profile preview"
+  },
+  "dependencies": {
+    "expo": "~55.0.0",
+    "expo-gl": "~55.0.13",
+    "expo-three": "^8.0.0",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
+    "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "eas-cli": "^16.0.0"
+  }
+}
