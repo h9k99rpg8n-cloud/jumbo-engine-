@@ -57,7 +57,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   pointer-events: auto;
 }
 
@@ -107,11 +107,20 @@ button {
   transform: scale(0.96);
 }
 
-.plus-icon {
+.plus-icon,
+.select-icon,
+.move-icon,
+.rotate-icon,
+.scale-icon {
   position: relative;
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+.plus-icon {
   width: 24px;
   height: 24px;
-  display: block;
 }
 
 .plus-icon::before,
@@ -132,11 +141,37 @@ button {
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
-.move-icon {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  display: block;
+.finger-tip {
+  position: absolute;
+  left: 13px;
+  top: 2px;
+  width: 9px;
+  height: 17px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.finger-body {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 11px;
+  height: 14px;
+  border-radius: 6px 6px 8px 8px;
+  background: #ffffff;
+  transform: rotate(-12deg);
+}
+
+.finger-hand {
+  position: absolute;
+  left: 5px;
+  top: 20px;
+  width: 19px;
+  height: 8px;
+  border-radius: 7px;
+  border: 3px solid #ffffff;
+  border-top: 0;
+  transform: rotate(-12deg);
 }
 
 .move-center {
@@ -173,9 +208,8 @@ button {
   transform: translateX(-50%);
 }
 
-.arrow-up {
-  top: 0;
-}
+.arrow-up { top: 0; }
+.arrow-down { bottom: 0; }
 
 .arrow-up::after {
   left: 50%;
@@ -184,10 +218,6 @@ button {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 7px solid #ffffff;
-}
-
-.arrow-down {
-  bottom: 0;
 }
 
 .arrow-down::after {
@@ -207,9 +237,8 @@ button {
   transform: translateY(-50%);
 }
 
-.arrow-left {
-  left: 0;
-}
+.arrow-left { left: 0; }
+.arrow-right { right: 0; }
 
 .arrow-left::after {
   left: -5px;
@@ -220,10 +249,6 @@ button {
   border-right: 7px solid #ffffff;
 }
 
-.arrow-right {
-  right: 0;
-}
-
 .arrow-right::after {
   right: -5px;
   top: 50%;
@@ -231,6 +256,82 @@ button {
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
   border-left: 7px solid #ffffff;
+}
+
+.rotate-ring {
+  position: absolute;
+  inset: 3px;
+  border: 4px solid #ffffff;
+  border-right-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-35deg);
+}
+
+.rotate-head {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid #ffffff;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transform: rotate(-28deg);
+}
+
+.scale-box {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #ffffff;
+  border-radius: 3px;
+}
+
+.scale-arrow {
+  position: absolute;
+  width: 11px;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.scale-arrow::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.scale-arrow-a {
+  right: 1px;
+  top: 5px;
+  transform: rotate(-45deg);
+}
+
+.scale-arrow-a::after {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 7px solid #ffffff;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.scale-arrow-b {
+  left: 1px;
+  bottom: 5px;
+  transform: rotate(-45deg);
+}
+
+.scale-arrow-b::after {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  border-left: 7px solid #ffffff;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
 }
 
 .create-menu {
