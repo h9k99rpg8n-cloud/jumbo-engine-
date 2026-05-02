@@ -1,15 +1,12 @@
-import {
-  ArcRotateCamera,
-  Color3,
-  Color4,
-  Engine,
-  GizmoManager,
-  HemisphericLight,
-  MeshBuilder,
-  Scene,
-  StandardMaterial,
-  Vector3,
-} from '@babylonjs/core';
+import { Engine } from '@babylonjs/core/Engines/engine.js';
+import { Scene } from '@babylonjs/core/scene.js';
+import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera.js';
+import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight.js';
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder.js';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial.js';
+import { Color3, Color4 } from '@babylonjs/core/Maths/math.color.js';
+import { Vector3 } from '@babylonjs/core/Maths/math.vector.js';
+import { GizmoManager } from '@babylonjs/core/Gizmos/gizmoManager.js';
 
 export class BabylonRenderer {
   constructor({ viewport }) {
@@ -18,25 +15,11 @@ export class BabylonRenderer {
     this.canvas.className = 'jumbo-canvas';
     this.viewport.appendChild(this.canvas);
 
-    this.engine = new Engine(this.canvas, true, {
-      preserveDrawingBuffer: true,
-      stencil: true,
-      antialias: true,
-      powerPreference: 'high-performance',
-    });
-
+    this.engine = new Engine(this.canvas, true);
     this.scene = new Scene(this.engine);
-    this.scene.clearColor = new Color4(0.01, 0.015, 0.03, 1);
+    this.scene.clearColor = new Color4(0.015, 0.02, 0.04, 1);
 
-    this.camera = new ArcRotateCamera(
-      'JumboEditorCamera',
-      Math.PI / 4,
-      Math.PI / 3.2,
-      70,
-      new Vector3(0, 0, 0),
-      this.scene,
-    );
-
+    this.camera = new ArcRotateCamera('JumboEditorCamera', Math.PI / 4, Math.PI / 3.15, 70, new Vector3(0, 0, 0), this.scene);
     this.camera.lowerRadiusLimit = 1.5;
     this.camera.upperRadiusLimit = 240;
     this.camera.wheelPrecision = 35;
@@ -46,10 +29,12 @@ export class BabylonRenderer {
     this.camera.attachControl(this.canvas, true);
 
     this.light = new HemisphericLight('Luz de vista interna', new Vector3(0, 1, 0), this.scene);
-    this.light.intensity = 0.95;
+    this.light.intensity = 1.35;
+    this.light.groundColor = new Color3(0.16, 0.2, 0.32);
 
     this.objects = [];
     this.selectedMesh = null;
+    this.currentTool = 'select';
 
     this.crearRejilla(200);
     this.crearGizmos();
@@ -58,17 +43,13 @@ export class BabylonRenderer {
   }
 
   crearRejilla(size) {
-    const grid = MeshBuilder.CreateGround('Rejilla 200 x 200', {
-      width: size,
-      height: size,
-      subdivisions: size,
-    }, this.scene);
+    const grid = MeshBuilder.CreateGround('Rejilla 200 x 200', { width: size, height: size, subdivisions: size }, this.scene);
 
     const material = new StandardMaterial('Material rejilla oscura', this.scene);
-    material.diffuseColor = new Color3(0.02, 0.03, 0.06);
+    material.diffuseColor = new Color3(0.015, 0.025, 0.055);
     material.specularColor = new Color3(0, 0, 0);
     material.wireframe = true;
-    material.emissiveColor = new Color3(0.05, 0.11, 0.24);
+    material.emissiveColor = new Color3(0.08, 0.16, 0.34);
 
     grid.material = material;
     grid.isPickable = false;
@@ -110,9 +91,7 @@ export class BabylonRenderer {
 
     if (this.selectedMesh && tool !== 'select') {
       this.gizmoManager.attachToMesh(this.selectedMesh);
-    }
-
-    if (tool === 'select' || !this.selectedMesh) {
+    } else {
       this.gizmoManager.attachToMesh(null);
     }
   }
@@ -123,8 +102,9 @@ export class BabylonRenderer {
     cube.metadata = { isJumboObject: true, type: 'cube' };
 
     const material = new StandardMaterial('Material cubo blanco', this.scene);
-    material.diffuseColor = new Color3(0.82, 0.82, 0.78);
-    material.specularColor = new Color3(0.18, 0.18, 0.18);
+    material.diffuseColor = new Color3(0.9, 0.9, 0.86);
+    material.emissiveColor = new Color3(0.08, 0.08, 0.08);
+    material.specularColor = new Color3(0.2, 0.2, 0.2);
     cube.material = material;
 
     this.objects.push(cube);
