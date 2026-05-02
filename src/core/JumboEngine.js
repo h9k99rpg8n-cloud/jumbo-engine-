@@ -1,0 +1,65 @@
+import { Renderer3D } from '../render/Renderer3D.js';
+import { EmptyGridScene } from '../scenes/EmptyGridScene.js';
+import { CameraController } from '../input/CameraController.js';
+import { EditorShell } from '../ui/EditorShell.js';
+
+export class JumboEngine {
+  constructor({ contenedor, nombre, version }) {
+    this.contenedor = contenedor;
+    this.nombre = nombre;
+    this.version = version;
+
+    this.ui = null;
+    this.renderer3D = null;
+    this.sceneModule = null;
+    this.cameraController = null;
+    this.animationId = null;
+  }
+
+  iniciar() {
+    this.ui = new EditorShell({
+      contenedor: this.contenedor,
+      nombre: this.nombre,
+      version: this.version,
+    });
+
+    this.ui.crear();
+
+    this.renderer3D = new Renderer3D({
+      viewport: this.ui.obtenerViewport(),
+    });
+
+    this.sceneModule = new EmptyGridScene({
+      gridSize: 100,
+      gridDivisions: 100,
+    });
+
+    this.sceneModule.crear();
+    this.renderer3D.usarEscena(this.sceneModule.scene);
+
+    this.cameraController = new CameraController({
+      camera: this.renderer3D.camera,
+      domElement: this.renderer3D.domElement,
+      target: this.sceneModule.target,
+      minDistance: 6,
+      maxDistance: 85,
+    });
+
+    this.cameraController.iniciar();
+    this.registrarEventos();
+    this.loop();
+  }
+
+  registrarEventos() {
+    window.addEventListener('resize', () => {
+      this.renderer3D.redimensionar();
+    });
+  }
+
+  loop() {
+    this.animationId = requestAnimationFrame(() => this.loop());
+
+    this.cameraController.actualizar();
+    this.renderer3D.renderizar();
+  }
+}
