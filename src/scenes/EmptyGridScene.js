@@ -6,6 +6,7 @@ export class EmptyGridScene {
     this.gridDivisions = gridDivisions;
     this.scene = null;
     this.target = new THREE.Vector3(0, 0, 0);
+    this.gameObjects = [];
   }
 
   crear() {
@@ -28,6 +29,20 @@ export class EmptyGridScene {
     axes.name = 'Ejes de origen';
     this.scene.add(axes);
 
+    const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.65);
+    luzAmbiente.name = 'Luz ambiente interna';
+    this.scene.add(luzAmbiente);
+
+    const luzVista = new THREE.DirectionalLight(0xffffff, 1.15);
+    luzVista.name = 'Luz de vista interna';
+    luzVista.position.set(8, 12, 8);
+    this.scene.add(luzVista);
+
     return this.scene;
+  }
+
+  agregarGameObject(gameObject) {
+    this.gameObjects.push(gameObject);
+    this.scene.add(gameObject.mesh);
   }
 }
