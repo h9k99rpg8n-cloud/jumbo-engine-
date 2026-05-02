@@ -3,7 +3,7 @@ import { EmptyGridScene } from '../scenes/EmptyGridScene.js';
 import { CameraController } from '../input/CameraController.js';
 import { EditorShell } from '../ui/EditorShell.js';
 import { ObjectFactory } from '../objects/ObjectFactory.js';
-import { MoveGizmo } from '../gizmos/MoveGizmo.js';
+import { TransformGizmo } from '../gizmos/TransformGizmo.js';
 
 export class JumboEngine {
   constructor({ contenedor, nombre, version }) {
@@ -15,7 +15,7 @@ export class JumboEngine {
     this.renderer3D = null;
     this.sceneModule = null;
     this.cameraController = null;
-    this.moveGizmo = null;
+    this.transformGizmo = null;
     this.objectFactory = new ObjectFactory();
     this.animationId = null;
   }
@@ -34,8 +34,8 @@ export class JumboEngine {
     });
 
     this.sceneModule = new EmptyGridScene({
-      gridSize: 100,
-      gridDivisions: 100,
+      gridSize: 200,
+      gridDivisions: 200,
     });
 
     this.sceneModule.crear();
@@ -46,11 +46,11 @@ export class JumboEngine {
       domElement: this.renderer3D.domElement,
       target: this.sceneModule.target,
       minDistance: 1.5,
-      maxDistance: 180,
-      initialDistance: 55,
+      maxDistance: 240,
+      initialDistance: 70,
     });
 
-    this.moveGizmo = new MoveGizmo({
+    this.transformGizmo = new TransformGizmo({
       camera: this.renderer3D.camera,
       domElement: this.renderer3D.domElement,
       sceneModule: this.sceneModule,
@@ -58,9 +58,9 @@ export class JumboEngine {
     });
 
     this.cameraController.iniciar();
-    this.moveGizmo.iniciar();
+    this.transformGizmo.iniciar();
     this.ui.onCrearCubo(() => this.crearCubo());
-    this.ui.onActivarMover((activo) => this.moveGizmo.setEnabled(activo));
+    this.ui.onCambiarHerramienta((tool) => this.transformGizmo.setMode(tool));
     this.registrarEventos();
     this.loop();
   }
