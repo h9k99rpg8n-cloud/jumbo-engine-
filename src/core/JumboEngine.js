@@ -2,6 +2,7 @@ import { Renderer3D } from '../render/Renderer3D.js';
 import { EmptyGridScene } from '../scenes/EmptyGridScene.js';
 import { CameraController } from '../input/CameraController.js';
 import { EditorShell } from '../ui/EditorShell.js';
+import { ObjectFactory } from '../objects/ObjectFactory.js';
 
 export class JumboEngine {
   constructor({ contenedor, nombre, version }) {
@@ -13,6 +14,7 @@ export class JumboEngine {
     this.renderer3D = null;
     this.sceneModule = null;
     this.cameraController = null;
+    this.objectFactory = new ObjectFactory();
     this.animationId = null;
   }
 
@@ -47,8 +49,14 @@ export class JumboEngine {
     });
 
     this.cameraController.iniciar();
+    this.ui.onCrearCubo(() => this.crearCubo());
     this.registrarEventos();
     this.loop();
+  }
+
+  crearCubo() {
+    const cubo = this.objectFactory.crearCubo();
+    this.sceneModule.agregarGameObject(cubo);
   }
 
   registrarEventos() {
