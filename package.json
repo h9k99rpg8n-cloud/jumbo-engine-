@@ -10,9 +10,8 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
-    "@vitejs/plugin-basic-ssl": "latest",
-    "vite": "latest",
-    "three": "latest"
+    "@babylonjs/core": "^8.0.0",
+    "vite": "latest"
   },
   "devDependencies": {}
 }
