@@ -1,4 +1,4 @@
-import { JumboEngine } from './motor/JumboEngine.js';
+import { JumboEngine } from './core/JumboEngine.js';
 import './styles.css';
 
 const app = document.querySelector('#app');
