@@ -48,25 +48,33 @@ button {
   touch-action: none;
 }
 
-.create-dock {
+.left-tools {
   position: fixed;
   left: max(14px, env(safe-area-inset-left));
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
   pointer-events: auto;
 }
 
-.create-button {
+.create-dock {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.create-button,
+.tool-button {
   width: 52px;
   height: 52px;
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(180deg, #1687ff 0%, #0754d6 100%);
   border: 1px solid rgba(183, 220, 255, 0.48);
   box-shadow:
     0 16px 36px rgba(0, 60, 180, 0.42),
@@ -74,7 +82,28 @@ button {
   cursor: pointer;
 }
 
-.create-button:active {
+.create-button {
+  background: linear-gradient(180deg, #1687ff 0%, #0754d6 100%);
+}
+
+.tool-button {
+  background: linear-gradient(180deg, #17243f 0%, #0a1226 100%);
+  border-color: rgba(143, 184, 255, 0.2);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.tool-button.is-active {
+  background: linear-gradient(180deg, #1b91ff 0%, #0754d6 100%);
+  border-color: rgba(212, 236, 255, 0.72);
+  box-shadow:
+    0 16px 38px rgba(0, 98, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.create-button:active,
+.tool-button:active {
   transform: scale(0.96);
 }
 
@@ -103,9 +132,113 @@ button {
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
+.move-icon {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+.move-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.arrow {
+  position: absolute;
+  display: block;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.arrow::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.arrow-up,
+.arrow-down {
+  left: 50%;
+  width: 4px;
+  height: 14px;
+  transform: translateX(-50%);
+}
+
+.arrow-up {
+  top: 0;
+}
+
+.arrow-up::after {
+  left: 50%;
+  top: -5px;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid #ffffff;
+}
+
+.arrow-down {
+  bottom: 0;
+}
+
+.arrow-down::after {
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #ffffff;
+}
+
+.arrow-left,
+.arrow-right {
+  top: 50%;
+  width: 14px;
+  height: 4px;
+  transform: translateY(-50%);
+}
+
+.arrow-left {
+  left: 0;
+}
+
+.arrow-left::after {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 7px solid #ffffff;
+}
+
+.arrow-right {
+  right: 0;
+}
+
+.arrow-right::after {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid #ffffff;
+}
+
 .create-menu {
+  position: absolute;
+  left: 62px;
+  top: 50%;
   opacity: 0;
-  transform: translateX(-8px) scale(0.96);
+  transform: translateY(-50%) translateX(-8px) scale(0.96);
   pointer-events: none;
   transition: opacity 160ms ease, transform 160ms ease;
   padding: 8px;
@@ -118,7 +251,7 @@ button {
 
 .create-menu.is-open {
   opacity: 1;
-  transform: translateX(0) scale(1);
+  transform: translateY(-50%) translateX(0) scale(1);
   pointer-events: auto;
 }
 
