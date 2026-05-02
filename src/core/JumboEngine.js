@@ -3,6 +3,7 @@ import { EmptyGridScene } from '../scenes/EmptyGridScene.js';
 import { CameraController } from '../input/CameraController.js';
 import { EditorShell } from '../ui/EditorShell.js';
 import { ObjectFactory } from '../objects/ObjectFactory.js';
+import { MoveGizmo } from '../gizmos/MoveGizmo.js';
 
 export class JumboEngine {
   constructor({ contenedor, nombre, version }) {
@@ -14,6 +15,7 @@ export class JumboEngine {
     this.renderer3D = null;
     this.sceneModule = null;
     this.cameraController = null;
+    this.moveGizmo = null;
     this.objectFactory = new ObjectFactory();
     this.animationId = null;
   }
@@ -48,8 +50,17 @@ export class JumboEngine {
       initialDistance: 55,
     });
 
+    this.moveGizmo = new MoveGizmo({
+      camera: this.renderer3D.camera,
+      domElement: this.renderer3D.domElement,
+      sceneModule: this.sceneModule,
+      cameraController: this.cameraController,
+    });
+
     this.cameraController.iniciar();
+    this.moveGizmo.iniciar();
     this.ui.onCrearCubo(() => this.crearCubo());
+    this.ui.onActivarMover((activo) => this.moveGizmo.setEnabled(activo));
     this.registrarEventos();
     this.loop();
   }
