@@ -14,11 +14,15 @@ export class TransformGizmo {
     this.pointer = new THREE.Vector2();
 
     this.controls = new TransformControls(this.camera, this.domElement);
-    this.controls.setSize(1.05);
-    this.controls.visible = false;
+    this.controls.setSize(1.15);
     this.controls.enabled = false;
 
-    this.sceneModule.scene.add(this.controls);
+    this.controlsHelper = this.controls.getHelper
+      ? this.controls.getHelper()
+      : this.controls;
+
+    this.controlsHelper.visible = false;
+    this.sceneModule.scene.add(this.controlsHelper);
 
     this.controls.addEventListener('dragging-changed', (event) => {
       this.cameraController.setBloqueado(event.value);
@@ -41,21 +45,18 @@ export class TransformGizmo {
     this.mode = mode;
 
     if (mode === 'select') {
-      this.controls.detach();
-      this.controls.visible = false;
-      this.controls.enabled = false;
+      this.ocultarControls();
       this.cameraController.setBloqueado(false);
       this.actualizarCursor();
       return;
     }
 
-    const transformMode = this.obtenerModoTransform(mode);
-    this.controls.setMode(transformMode);
-    this.controls.visible = Boolean(this.selectedObject);
-    this.controls.enabled = Boolean(this.selectedObject);
+    this.controls.setMode(this.obtenerModoTransform(mode));
 
     if (this.selectedObject) {
-      this.controls.attach(this.selectedObject.mesh);
+      this.mostrarControls(this.selectedObject.mesh);
+    } else {
+      this.ocultarControls();
     }
 
     this.actualizarCursor();
@@ -83,21 +84,31 @@ export class TransformGizmo {
     this.outline.visible = Boolean(gameObject);
 
     if (!gameObject) {
-      this.controls.detach();
-      this.controls.visible = false;
-      this.controls.enabled = false;
+      this.ocultarControls();
       this.actualizarOutline();
       return;
     }
 
     if (this.mode !== 'select') {
-      this.controls.attach(gameObject.mesh);
-      this.controls.visible = true;
-      this.controls.enabled = true;
       this.controls.setMode(this.obtenerModoTransform(this.mode));
+      this.mostrarControls(gameObject.mesh);
+    } else {
+      this.ocultarControls();
     }
 
     this.actualizarOutline();
+  }
+
+  mostrarControls(mesh) {
+    this.controls.attach(mesh);
+    this.controls.enabled = true;
+    this.controlsHelper.visible = true;
+  }
+
+  ocultarControls() {
+    this.controls.detach();
+    this.controls.enabled = false;
+    this.controlsHelper.visible = false;
   }
 
   obtenerModoTransform(mode) {
