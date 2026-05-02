@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 export class TransformGizmo {
   constructor({ camera, domElement, sceneModule, cameraController }) {
@@ -9,18 +10,23 @@ export class TransformGizmo {
 
     this.mode = 'select';
     this.selectedObject = null;
-    this.isDragging = false;
-
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
-    this.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    this.hitPoint = new THREE.Vector3();
-    this.dragOffset = new THREE.Vector3();
 
-    this.startX = 0;
-    this.startY = 0;
-    this.startRotationY = 0;
-    this.startScale = new THREE.Vector3(1, 1, 1);
+    this.controls = new TransformControls(this.camera, this.domElement);
+    this.controls.setSize(1.05);
+    this.controls.visible = false;
+    this.controls.enabled = false;
+
+    this.sceneModule.scene.add(this.controls);
+
+    this.controls.addEventListener('dragging-changed', (event) => {
+      this.cameraController.setBloqueado(event.value);
+    });
+
+    this.controls.addEventListener('change', () => {
+      this.actualizarOutline();
+    });
 
     this.outline = this.crearOutline();
     this.outline.visible = false;
@@ -29,20 +35,35 @@ export class TransformGizmo {
 
   iniciar() {
     this.domElement.addEventListener('pointerdown', (event) => this.onPointerDown(event));
-    this.domElement.addEventListener('pointermove', (event) => this.onPointerMove(event));
-    this.domElement.addEventListener('pointerup', (event) => this.onPointerUp(event));
-    this.domElement.addEventListener('pointercancel', (event) => this.onPointerUp(event));
   }
 
   setMode(mode) {
     this.mode = mode;
-    this.isDragging = false;
-    this.cameraController.setBloqueado(false);
+
+    if (mode === 'select') {
+      this.controls.detach();
+      this.controls.visible = false;
+      this.controls.enabled = false;
+      this.cameraController.setBloqueado(false);
+      this.actualizarCursor();
+      return;
+    }
+
+    const transformMode = this.obtenerModoTransform(mode);
+    this.controls.setMode(transformMode);
+    this.controls.visible = Boolean(this.selectedObject);
+    this.controls.enabled = Boolean(this.selectedObject);
+
+    if (this.selectedObject) {
+      this.controls.attach(this.selectedObject.mesh);
+    }
+
     this.actualizarCursor();
   }
 
   onPointerDown(event) {
     if (event.pointerType === 'touch' && event.isPrimary === false) return;
+    if (this.controls.dragging) return;
 
     this.actualizarPointer(event);
     const objetoTocado = this.buscarObjeto();
@@ -55,88 +76,34 @@ export class TransformGizmo {
     if (objetoTocado) {
       this.seleccionar(objetoTocado);
     }
-
-    if (!this.selectedObject) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.isDragging = true;
-    this.cameraController.setBloqueado(true);
-    this.domElement.setPointerCapture?.(event.pointerId);
-
-    this.startX = event.clientX;
-    this.startY = event.clientY;
-    this.startRotationY = this.selectedObject.mesh.rotation.y;
-    this.startScale.copy(this.selectedObject.mesh.scale);
-
-    if (this.raycaster.ray.intersectPlane(this.dragPlane, this.hitPoint)) {
-      this.dragOffset.copy(this.selectedObject.mesh.position).sub(this.hitPoint);
-    }
-
-    this.actualizarCursor();
-  }
-
-  onPointerMove(event) {
-    if (!this.isDragging || !this.selectedObject) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (this.mode === 'move') {
-      this.mover(event);
-      return;
-    }
-
-    if (this.mode === 'rotate') {
-      this.rotar(event);
-      return;
-    }
-
-    if (this.mode === 'scale') {
-      this.escalar(event);
-    }
-  }
-
-  onPointerUp(event) {
-    if (!this.isDragging) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.isDragging = false;
-    this.cameraController.setBloqueado(false);
-    this.actualizarCursor();
-  }
-
-  mover(event) {
-    this.actualizarPointer(event);
-
-    if (!this.raycaster.ray.intersectPlane(this.dragPlane, this.hitPoint)) return;
-
-    const nextPosition = this.hitPoint.clone().add(this.dragOffset);
-    nextPosition.y = this.selectedObject.mesh.position.y;
-    this.selectedObject.mesh.position.copy(nextPosition);
-    this.actualizarOutline();
-  }
-
-  rotar(event) {
-    const deltaX = event.clientX - this.startX;
-    this.selectedObject.mesh.rotation.y = this.startRotationY + deltaX * 0.015;
-    this.actualizarOutline();
-  }
-
-  escalar(event) {
-    const deltaY = this.startY - event.clientY;
-    const factor = THREE.MathUtils.clamp(1 + deltaY * 0.01, 0.2, 6);
-    this.selectedObject.mesh.scale.copy(this.startScale).multiplyScalar(factor);
-    this.actualizarOutline();
   }
 
   seleccionar(gameObject) {
     this.selectedObject = gameObject;
     this.outline.visible = Boolean(gameObject);
+
+    if (!gameObject) {
+      this.controls.detach();
+      this.controls.visible = false;
+      this.controls.enabled = false;
+      this.actualizarOutline();
+      return;
+    }
+
+    if (this.mode !== 'select') {
+      this.controls.attach(gameObject.mesh);
+      this.controls.visible = true;
+      this.controls.enabled = true;
+      this.controls.setMode(this.obtenerModoTransform(this.mode));
+    }
+
     this.actualizarOutline();
+  }
+
+  obtenerModoTransform(mode) {
+    if (mode === 'rotate') return 'rotate';
+    if (mode === 'scale') return 'scale';
+    return 'translate';
   }
 
   actualizarPointer(event) {
@@ -162,7 +129,10 @@ export class TransformGizmo {
   }
 
   actualizarOutline() {
-    if (!this.selectedObject) return;
+    if (!this.selectedObject) {
+      this.outline.visible = false;
+      return;
+    }
 
     const box = new THREE.Box3().setFromObject(this.selectedObject.mesh);
     const size = new THREE.Vector3();
@@ -171,17 +141,13 @@ export class TransformGizmo {
     box.getSize(size);
     box.getCenter(center);
 
+    this.outline.visible = true;
     this.outline.position.copy(center);
-    this.outline.rotation.copy(this.selectedObject.mesh.rotation);
+    this.outline.rotation.set(0, 0, 0);
     this.outline.scale.set(size.x, size.y, size.z);
   }
 
   actualizarCursor() {
-    if (this.mode === 'select') {
-      this.domElement.style.cursor = 'default';
-      return;
-    }
-
-    this.domElement.style.cursor = this.isDragging ? 'grabbing' : 'grab';
+    this.domElement.style.cursor = this.mode === 'select' ? 'default' : 'grab';
   }
 }
