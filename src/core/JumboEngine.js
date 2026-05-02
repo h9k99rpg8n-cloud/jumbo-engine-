@@ -41,8 +41,9 @@ export class JumboEngine {
       camera: this.renderer3D.camera,
       domElement: this.renderer3D.domElement,
       target: this.sceneModule.target,
-      minDistance: 6,
-      maxDistance: 85,
+      minDistance: 1.5,
+      maxDistance: 180,
+      initialDistance: 55,
     });
 
     this.cameraController.iniciar();
